@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form for working with existing orders (Quick Pack ONLY) -->
+    <record model="ir.ui.view" id="view_packaging_order_form">
+        <field name="name">packaging.order.form</field>
+        <field name="model">packaging.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="responsible_id" readonly="1"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="total_items" readonly="1"/>
+                            <field name="packed_items" readonly="1"/>
+                            <field name="progress" widget="progressbar" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Quick Pack">
+                        <group>
+                            <field name="quick_pack_item_code" placeholder="Enter item code to mark as packed" class="oe_inline"/>
+                            <button name="action_quick_pack" string="Mark as Packed" type="object" class="btn-primary oe_inline" style="margin-left: 10px;"/>
+                        </group>
+                    </group>
+
+                    <group string="Shipping Labels">
+                        <field name="auto_print_labels"/>
+                        <field name="last_label_id" widget="many2one" options="{'no_open': True}"/>
+                        <button name="action_manual_print_label" string="Print Shipping Label" type="object" class="btn-primary"/>
+                    </group>
+
+                    <group string="Defective Information" invisible="state != 'defective'">
+                        <group>
+                            <field name="defective_reason" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="defective_date" readonly="1"/>
+                            <field name="defective_operator_id" readonly="1"/>
+                        </group>
+                    </group>
+
+
+                    <group>
+
+                    
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="responsible_id" readonly="1"/>
+                        <field name="state"/>
+                    </group>
+                    <group>
+                        <field name="total_items" readonly="1"/>
+                        <field name="packed_items" readonly="1"/>
+                        <field name="defective_items" readonly="1"/>  <!-- Добавляем поле -->
+                        <field name="progress" widget="progressbar" readonly="1"/>
+                    </group>
+                </group>
+
+                    <field name="item_ids">
+                        <list>
+                            <field name="item_code"/>
+                            <field name="product_name"/>
+                            <field name="dimensions"/>
+                            <field name="is_packed" widget="boolean_toggle"/>
+                            <field name="pack_date"/>
+                        </list>
+                    </field>
+
+                    <field name="label_ids" colspan="4">
+                        <list>
+                            <field name="name"/>
+                            <field name="print_date"/>
+                            <field name="printed" widget="boolean_toggle"/>
+                            <button name="action_print_label" string="Re-print" type="object" class="btn-secondary"/>
+                        </list>
+                    </field>
+
+                    <footer>
+                        <button name="action_mark_completed" string="Mark as Completed" type="object" class="btn-primary" invisible="not show_mark_completed"/>
+                        <button name="action_mark_defective" string="Mark as Defective" type="object" class="btn-danger" invisible="not show_mark_defective"/>
+                        <button name="action_reset_to_draft" string="Reset to Draft" type="object" class="btn-secondary" invisible="not show_reset_draft"/>
+                        <button name="action_cancel_order" string="Cancel Order" type="object" class="btn-warning" invisible="not show_cancel_order"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for viewing orders -->
+    <record model="ir.actions.act_window" id="action_packaging_order_view">
+        <field name="name">Packaging Order</field>
+        <field name="res_model">packaging.order</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_packaging_order_form"/>
+        <field name="target">current</field>
+    </record>
+</odoo>

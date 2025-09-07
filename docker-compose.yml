@@ -1,0 +1,41 @@
+services:
+  odoo:
+    image: odoo:18.0
+    container_name: odoo18
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+      - UPDATE=asai_test_task
+    volumes:
+      - odoo-webdata:/var/lib/odoo
+      - ./addons:/mnt/extra-addons
+      - ./config:/etc/odoo
+      - ./logs:/var/log/odoo  # Опционально: логи
+    command: >
+      sh -c "
+        exec odoo --config /etc/odoo/odoo.conf --dev=all
+      "
+    restart: unless-stopped
+
+  db:
+    image: postgres:15
+    container_name: odoo18-db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-dbdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+
+volumes:
+  odoo-webdata:
+  odoo-dbdata:

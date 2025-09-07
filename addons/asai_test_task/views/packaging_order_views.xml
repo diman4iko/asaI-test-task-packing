@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Search view with quick search by order number -->
+    <record model="ir.ui.view" id="view_packaging_order_search">
+        <field name="name">packaging.order.search</field>
+        <field name="model">packaging.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Order Number"/>
+                <field name="responsible_id"/>
+                <separator/>
+                <filter string="In Progress" name="in_progress" 
+                        domain="[('packed_items', '&gt;', 0), ('packed_items', '&lt;', total_items)]"/>
+                <filter string="Completed" name="completed" 
+                        domain="[('packed_items', '=', total_items), ('total_items', '&gt;', 0)]"/>
+                <filter string="Not Started" name="not_started" 
+                        domain="[('packed_items', '=', 0), ('total_items', '&gt;', 0)]"/>
+                <filter string="No Items" name="no_items" 
+                        domain="[('total_items', '=', 0)]"/>
+                <filter string="Defective" name="defective" domain="[('state', '=', 'defective')]"/>
+                
+                <!-- Quick jump to order by number -->
+                <group string="Quick Jump to Order">
+                    <field name="quick_jump_order_number" widget="integer" placeholder="Enter order number"/>
+                    <button name="action_quick_jump_to_order" string="Go to Order" type="object" class="btn-primary"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Packaging Order List View -->
+    <record model="ir.ui.view" id="view_packaging_order_tree">
+        <field name="name">packaging.order.list</field>
+        <field name="model">packaging.order</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" string="Order Number"/>
+                <field name="responsible_id"/>
+                <field name="total_items"/>
+                <field name="packed_items"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="state"/>
+                <button name="action_open_order" string="Open" type="object" class="btn-primary"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action for main orders list -->
+    <record model="ir.actions.act_window" id="action_packaging_order_list">
+        <field name="name">Packaging Orders</field>
+        <field name="res_model">packaging.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_packaging_order_tree"/>
+        <field name="search_view_id" ref="view_packaging_order_search"/>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Menu Structure -->
+    <menuitem id="menu_packaging_root" name="Packaging Control" sequence="80"/>
+      
+    <menuitem id="menu_packaging_orders" 
+              name="Packaging Orders" 
+              parent="menu_packaging_root"
+              action="action_packaging_order_list"
+              sequence="10"/>
+</odoo>

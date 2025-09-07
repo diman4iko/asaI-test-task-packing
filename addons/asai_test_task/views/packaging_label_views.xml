@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Label List View -->
+    <record model="ir.ui.view" id="view_packaging_label_tree">
+        <field name="name">packaging.label.list</field>
+        <field name="model">packaging.label</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="order_id"/>
+                <field name="print_date"/>
+                <field name="printed" widget="boolean_toggle"/>
+                <button name="action_print_label" string="Print" type="object" class="btn-primary"/>
+                <button name="action_download_label" string="Download" type="object" class="btn-secondary"/>
+                <button name="action_view_label" string="View" type="object" class="btn-info"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Label Form View -->
+    <record model="ir.ui.view" id="view_packaging_label_form">
+        <field name="name">packaging.label.form</field>
+        <field name="model">packaging.label</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="order_id"/>
+                        </group>
+                        <group>
+                            <field name="print_date"/>
+                            <field name="printed"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="label_filename"/>
+                        <button name="action_print_label" string="Print Label" type="object" class="btn-primary"/>
+                        <button name="action_download_label" string="Download PDF" type="object" class="btn-secondary"/>
+                        <button name="action_view_label" string="View in Browser" type="object" class="btn-info"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for Labels -->
+    <record model="ir.actions.act_window" id="action_packaging_label">
+        <field name="name">Shipping Labels</field>
+        <field name="res_model">packaging.label</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_packaging_label_tree"/>
+    </record>
+
+    <!-- Menu for Labels -->
+    <menuitem id="menu_packaging_labels" 
+              name="Shipping Labels" 
+              parent="menu_packaging_root"
+              action="action_packaging_label"
+              sequence="20"/>
+</odoo>

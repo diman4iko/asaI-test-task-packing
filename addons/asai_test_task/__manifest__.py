@@ -1,0 +1,19 @@
+{
+    'name': 'АСАИ – Тестовое задание – Упаковка',
+    'version': '1.0',
+    'sequence': '1',
+    'category': 'Inventory',
+    'summary': 'Control packing process',
+    'depends': ['base'],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/packaging_order_views.xml',    
+        'views/packaging_order_create_views.xml',
+        'views/packaging_order_form_views.xml',
+        'views/packaging_item_views.xml',        
+        'views/packaging_label_views.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+}

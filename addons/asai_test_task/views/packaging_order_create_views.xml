@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form for creating orders with CSV import ONLY -->
+    <record model="ir.ui.view" id="view_packaging_order_form_create">
+        <field name="name">packaging.order.form.create</field>
+        <field name="model">packaging.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" string="Order Number" required="1"/>
+                            <field name="responsible_id" required="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Import Items from CSV">
+                        <field name="import_filename" invisible="1"/>
+                        <field name="import_file" filename="import_filename" string="CSV File" required="1"/>
+                        <button name="action_import_csv" string="Import CSV" type="object" class="btn-primary"/>
+                    </group>
+                    
+                    <footer>
+                        <button name="create" string="Create Order" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for creating orders -->
+    <record model="ir.actions.act_window" id="action_packaging_order_create">
+        <field name="name">Create Packaging Order</field>
+        <field name="res_model">packaging.order</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_packaging_order_form_create"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu for creating orders -->
+    <menuitem id="menu_packaging_create" 
+              name="Create Order from CSV" 
+              parent="menu_packaging_root"
+              action="action_packaging_order_create"
+              sequence="15"/>
+</odoo>

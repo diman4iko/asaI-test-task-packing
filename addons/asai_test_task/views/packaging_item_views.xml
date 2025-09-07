@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Search view for packaging items -->
+    <record model="ir.ui.view" id="view_packaging_item_search">
+        <field name="name">packaging.item.search</field>
+        <field name="model">packaging.item</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="item_code"/>
+                <field name="product_name"/>
+                <field name="order_id"/>
+                <separator/>
+                <filter string="Defective Items" name="defective" domain="[('is_defective', '=', True)]"/>
+                <filter string="Good Items" name="good" domain="[('is_defective', '=', False)]"/>
+                <filter string="Packed Items" name="packed" domain="[('is_packed', '=', True)]"/>
+                <filter string="Unpacked Items" name="unpacked" domain="[('is_packed', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Packaging Item List View -->
+    <record model="ir.ui.view" id="view_packaging_item_tree">
+        <field name="name">packaging.item.list</field>
+        <field name="model">packaging.item</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="item_code"/>
+                <field name="product_name"/>
+                <field name="dimensions"/>
+                <field name="is_packed" widget="boolean_toggle"/>
+                <field name="is_defective" widget="boolean_toggle"/>
+                <field name="pack_date"/>
+                <button name="action_mark_defective_simple" string="Mark Defective" type="object" class="btn-danger" 
+                        invisible="is_defective or is_packed"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action for Packaging Items -->
+    <record model="ir.actions.act_window" id="action_packaging_item">
+        <field name="name">Packaging Items</field>
+        <field name="res_model">packaging.item</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_packaging_item_tree"/>
+        <field name="search_view_id" ref="view_packaging_item_search"/>
+    </record>
+</odoo>
