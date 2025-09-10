@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard form for report parameters -->
+    <record model="ir.ui.view" id="view_defective_report_wizard_form">
+        <field name="name">defective.report.wizard.form</field>
+        <field name="model">packaging.defective.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="responsible_id"/>
+                            <field name="show_details"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_generate_report" string="Generate Report" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Simple results view without complex formatting -->
+    <record model="ir.ui.view" id="view_defective_report_results_form">
+        <field name="name">defective.report.results.form</field>
+        <field name="model">packaging.defective.report.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Defective Orders Report</h1>
+                    </div>
+
+                    <div>
+                        <strong>Period: </strong>
+                        <span>From <field name="date_from"/> to <field name="date_to"/></span>
+                    </div>
+                    
+                    <div>
+                        <strong>Responsible: </strong>
+                        <field name="responsible_id" readonly="1"/>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3>Report Summary</h3>
+                        <div>
+                            This report shows defective orders for the selected period. 
+                            Use the Print PDF button to generate a detailed report.
+                        </div>
+                    </div>
+
+                    <footer>
+                        <button name="action_print_report" string="Print PDF" type="object" class="btn-primary"/>
+                        <button name="action_export_excel" string="Export Excel" type="object" class="btn-secondary"/>
+                        <button string="Close" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for report -->
+    <record model="ir.actions.act_window" id="action_defective_report">
+        <field name="name">Defective Orders Report</field>
+        <field name="res_model">packaging.defective.report</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_defective_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu for report -->
+    <menuitem id="menu_defective_report" 
+              name="Defective Orders Report" 
+              parent="menu_packaging_root"
+              action="action_defective_report"
+              sequence="25"/>
+</odoo>

@@ -11,6 +11,7 @@ services:
       - USER=odoo
       - PASSWORD=odoo
       - UPDATE=asai_test_task
+      - test-enable
     volumes:
       - odoo-webdata:/var/lib/odoo
       - ./addons:/mnt/extra-addons

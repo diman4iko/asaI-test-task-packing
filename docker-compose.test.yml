@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  odoo-test:
+    image: odoo:18.0
+    container_name: odoo18-test
+    depends_on:
+      - db-test
+    environment:
+      - PGPASSWORD=odoo
+    volumes:
+      - ./addons:/mnt/extra-addons
+      - ./config/odoo-test.conf:/etc/odoo/odoo.conf  # Монтируем тестовый конфиг
+    command: >
+      sh -c "
+        # Ждем базу данных
+        echo 'Waiting for database...'
+        while ! pg_isready -h db-test -U odoo; do sleep 2; done
+        
+        echo 'Starting tests...'
+        
+        # Запускаем тесты
+        odoo --test-enable --stop-after-init --init=asai_test_task --test-tags=asai_test_task
+        
+        # Проверяем результат
+        if [ $$? -eq 0 ]; then
+            echo '✅ ALL TESTS PASSED'
+            exit 0
+        else
+            echo '❌ TESTS FAILED'
+            exit 1
+        fi
+      "
+
+  db-test:
+    image: postgres:15
+    container_name: odoo18-db-test
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-test-dbdata:/var/lib/postgresql/data
+
+volumes:
+  odoo-test-dbdata:

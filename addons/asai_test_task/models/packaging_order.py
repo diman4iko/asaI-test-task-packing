@@ -54,6 +54,11 @@ class PackagingOrder(models.Model):
         string='Show Cancel Order'
     )
 
+    show_reset_packing = fields.Boolean(
+    compute='_compute_button_visibility',
+    string='Show Reset Packing'
+    )
+
     # Relations
     item_ids = fields.One2many(
         'packaging.item', 
@@ -118,24 +123,6 @@ class PackagingOrder(models.Model):
         for order in self:
             order.total_items = len(order.item_ids)
 
-    @api.depends('item_ids.is_packed')
-    def _compute_packed_items(self):
-        for order in self:
-            packed_count = len(order.item_ids.filtered(lambda x: x.is_packed))
-            order.packed_items = packed_count
-            
-            # Автоматическое обновление состояния только для сохраненных записей
-            if order.id and order.state not in ['canceled', 'defective']:  # Исключаем defective
-                if packed_count == order.total_items and order.total_items > 0:
-                    if order.state != 'completed':
-                        order.state = 'completed'
-                        order._handle_completed_order()
-                elif packed_count > 0:
-                    if order.state != 'in_progress':
-                        order.state = 'in_progress'
-                else:
-                    if order.state != 'draft':
-                        order.state = 'draft'
 
     @api.depends('total_items', 'packed_items')
     def _compute_progress(self):
@@ -153,30 +140,32 @@ class PackagingOrder(models.Model):
             order.show_reset_draft = order.state in ['completed', 'canceled']
             order.show_cancel_order = order.state in ['draft', 'in_progress']
             order.show_mark_defective = order.state in ['draft', 'in_progress']
+            order.show_reset_packing = order.state in ['in_progress', 'defective']
 
 
-    @api.depends('item_ids.is_packed', 'item_ids.is_defective')  # Добавляем зависимость от is_defective
+    @api.depends('item_ids.is_packed', 'item_ids.is_defective')
     def _compute_packed_items(self):
         for order in self:
             packed_count = len(order.item_ids.filtered(lambda x: x.is_packed))
             defective_count = len(order.item_ids.filtered(lambda x: x.is_defective))
             order.packed_items = packed_count
+            order.defective_items = defective_count
             
             # Автоматическое обновление состояния только для сохраненных записей
             if order.id and order.state not in ['canceled', 'defective']:
                 if defective_count > 0:
                     if order.state != 'defective':
-                        order.state = 'defective'
                         order.write({
+                            'state': 'defective',
                             'defective_reason': f'Automatic: {defective_count} defective item(s)',
                             'defective_date': fields.Datetime.now(),
                             'defective_operator_id': self.env.user.id
                         })
-                # Старая логика для упаковки
                 elif packed_count == order.total_items and order.total_items > 0:
                     if order.state != 'completed':
-                        order.state = 'completed'
-                        order._handle_completed_order()
+                        # Используем write для изменения состояния и затем вызываем обработчик
+                        order.write({'state': 'completed'})
+                        order._handle_completed_order()  # Явно вызываем обработчик
                 elif packed_count > 0:
                     if order.state != 'in_progress':
                         order.state = 'in_progress'
@@ -204,21 +193,18 @@ class PackagingOrder(models.Model):
     def _handle_completed_order(self):
         """Handle actions when order is completed"""
         for order in self:
-            if order.auto_print_labels and not order.label_ids:
+            if order.auto_print_labels:
+                # Удаляем существующие этикетки и создаем новую
+                order.label_ids.unlink()
                 order._auto_print_shipping_label()
 
     def _auto_print_shipping_label(self):
         """Automatically generate shipping label for completed order"""
         try:
-            # Убедимся что self.id существует
-            if not self.id:
-                _logger.error("Cannot create label - order not saved yet!")
-                return
-                
             label = self.env['packaging.label'].create({
-                'order_id': self.id,  # Передаем корректный order_id
+                'order_id': self.id,
             })
-            self.write({'last_label_id': label.id})  # Используем write вместо прямого присвоения
+            self.write({'last_label_id': label.id})
             _logger.info("Shipping label created for order %s", self.name)
         except Exception as e:
             _logger.error("Failed to create shipping label for order %s: %s", self.name, str(e))
@@ -254,6 +240,37 @@ class PackagingOrder(models.Model):
             'warning'
         )
     
+    def action_reset_packing(self):
+        """Reset all items packing status in the order"""
+        self.ensure_one()
+        
+        if self.state not in ['in_progress', 'defective']:
+            raise UserError(_("Can only reset packing for orders in progress or defective state"))
+        
+        # Сбрасываем статус упаковки всех товаров
+        self.item_ids.write({
+            'is_packed': False,
+            'pack_date': False,
+            'is_defective': False,
+            'defective_reason': False,
+            'defective_date': False,
+            'defective_operator_id': False
+        })
+        
+        # Сбрасываем статус заказа
+        self.write({
+            'state': 'draft',
+            'defective_reason': False,
+            'defective_date': False,
+            'defective_operator_id': False
+        })
+        
+        return self._show_notification(
+            _("Packing Reset"),
+            _("All items have been reset to unpacked state"),
+            'success'
+        )
+        
     def action_mark_defective(self):
         """Mark order as defective with reason"""
         self.ensure_one()
@@ -418,3 +435,9 @@ class PackagingOrder(models.Model):
                 (self.env.ref('asai_test_task.view_packaging_order_form_create').id, 'form')
             ]
         return result
+    
+    @api.model
+    def _valid_field_parameter(self, field, name):
+        if name == 'tracking':
+            return True
+        return super()._valid_field_parameter(field, name)

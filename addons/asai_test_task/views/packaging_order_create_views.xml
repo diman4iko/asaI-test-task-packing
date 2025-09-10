@@ -21,7 +21,7 @@
                     </group>
                     
                     <footer>
-                        <button name="create" string="Create Order" type="object" class="btn-primary"/>
+                        <button name="action_import_csv" string="Create Order" type="object" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </sheet>

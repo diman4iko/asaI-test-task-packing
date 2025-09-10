@@ -2,3 +2,7 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_packaging_order_user,packaging.order.user,model_packaging_order,base.group_user,1,1,1,1
 access_packaging_item_user,packaging.item.user,model_packaging_item,base.group_user,1,1,1,1
 access_packaging_label_user,packaging.label.user,model_packaging_label,base.group_user,1,1,1,1
+access_packaging_defective_report_user,packaging.defective.report.user,model_packaging_defective_report,base.group_user,1,1,1,0
+access_packaging_defective_report_wizard_user,packaging.defective.report.wizard.user,model_packaging_defective_report_wizard,base.group_user,1,1,1,0
+access_packaging_item_defective_wizard_user,packaging.item.defective.wizard.user,model_packaging_item_defective_wizard,base.group_user,1,1,1,0
+access_packaging_order_defective_wizard_user,packaging.order.defective.wizard.user,model_packaging_order_defective_wizard,base.group_user,1,1,1,0

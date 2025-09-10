@@ -1,10 +1,11 @@
-from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
 import base64
 import logging
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -28,10 +29,15 @@ class PackagingLabel(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name', 'New') == 'New':
+            # Используем последовательность вместо ручной генерации
             vals['name'] = self.env['ir.sequence'].next_by_code('packaging.label') or 'New'
         
+        # Проверяем формат номера перед созданием
+        if not re.match(r'^L\d+$', vals['name']):
+            raise ValidationError(_("Label number must be in format L000001!"))
+        
         if not vals.get('order_id'):
-            raise UserError("Order ID is required for creating a label!")
+            raise UserError(_("Order ID is required for creating a label!"))
         
         # Создаем запись
         label = super(PackagingLabel, self).create(vals)
@@ -40,6 +46,13 @@ class PackagingLabel(models.Model):
         label._generate_pdf_label()
             
         return label
+    
+    @api.constrains('name')
+    def _check_label_number(self):
+        """Validate that label number is in correct format"""
+        for label in self:
+            if not re.match(r'^L\d+$', label.name):
+                raise ValidationError(_("Label number must be in format L000001!"))
 
     def _generate_pdf_label(self):
         """Generate PDF content for shipping label"""
