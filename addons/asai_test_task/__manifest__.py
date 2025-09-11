@@ -10,6 +10,7 @@
         'security/ir.model.access.csv',
         'views/packaging_order_views.xml',    
         'views/packaging_order_create_views.xml',
+        'views/quick_jump_wizard_views.xml',
         'views/packaging_order_form_views.xml',
         'views/packaging_item_views.xml',        
         'views/packaging_label_views.xml',

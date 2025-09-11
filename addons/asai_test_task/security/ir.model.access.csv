@@ -6,3 +6,4 @@ access_packaging_defective_report_user,packaging.defective.report.user,model_pac
 access_packaging_defective_report_wizard_user,packaging.defective.report.wizard.user,model_packaging_defective_report_wizard,base.group_user,1,1,1,0
 access_packaging_item_defective_wizard_user,packaging.item.defective.wizard.user,model_packaging_item_defective_wizard,base.group_user,1,1,1,0
 access_packaging_order_defective_wizard_user,packaging.order.defective.wizard.user,model_packaging_order_defective_wizard,base.group_user,1,1,1,0
+access_packaging_order_quick_jump_wizard_user,packaging.order.quick.jump.wizard.user,model_packaging_order_quick_jump_wizard,base.group_user,1,1,1,0

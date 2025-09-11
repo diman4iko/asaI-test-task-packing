@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form for Quick Jump ONLY -->
+    <record model="ir.ui.view" id="view_quick_jump_wizard_form">
+        <field name="name">quick.jump.wizard.form</field>
+        <field name="model">packaging.order.quick.jump.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_number"
+                                   id="order_number_field"
+                                   placeholder="Scan or enter order number"
+                                   required="1"/>
+                        </group>
+                    </group>
+
+                    <footer>
+                        <button name="action_confirm_jump" string="Go to Order" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for Quick Jump -->
+    <record model="ir.actions.act_window" id="action_quick_jump_wizard">
+        <field name="name">Quick Jump to Order</field>
+        <field name="res_model">packaging.order.quick.jump.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_quick_jump_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu for Quick Jump -->
+    <menuitem id="menu_quick_jump"
+              name="Quick Jump to Order"
+              parent="menu_packaging_root"
+              action="action_quick_jump_wizard"
+              sequence="20"/>
+</odoo>
